@@ -1,0 +1,12 @@
+-GENERAL
+    - Add the explosive egg enemy
+    - Read maps from the map editor
+    - Read all sprites from a certain folder into an Animation object
+    Instead of having to type out paths for each one
+    - If needed read all assets from a file instead of hardcoding (Due Date: whenever but would be much cleaner)
+
+
+-Code Specific
+    - Pack up all the stuff in main.cpp/h into a Game class
+    - Rewrite velocity system in the player code
+    - Clean up object system's inheritance stuff
