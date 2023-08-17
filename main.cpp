@@ -57,14 +57,89 @@ int main(int argc, char* argv[])
         animation->id = ANIM_TILE;
         asset_mng->AddAnimation(animation);
 
-        Tilemap* player = new Tilemap(renderer,
-         "C:/Users/admin/source/repos/Temporintial/Temporintial/assets/player/real.png",
-          6, 1);
-        player->tile_width = 14;
-        animation = new Animation();
-        animation->AddSprite(player);
-        animation->id = ANIM_PLAYER;
-        asset_mng->AddAnimation(animation);
+        {
+            Animation* player_idle = new Animation();
+
+            const char* idle_frames[] =
+            {
+            "C:/Users/admin/source/repos/Temporintial/Temporintial/assets/player/idle/0.png",
+            "C:/Users/admin/source/repos/Temporintial/Temporintial/assets/player/idle/2.png",
+            "C:/Users/admin/source/repos/Temporintial/Temporintial/assets/player/idle/3.png"
+            };
+
+            for (int i = 0; i < sizeof(idle_frames) / sizeof(const char*); i++)
+            {
+                Sprite* idle = new Sprite(renderer, idle_frames[i]);
+                if (idle)
+                {
+                    player_idle->AddSprite(idle);
+                }
+            }
+
+            player_idle->id = ANIM_PLAYER_IDLE;
+            player_idle->speed = 18;
+            asset_mng->AddAnimation(player_idle);
+        }
+
+        {
+            Animation* player_run = new Animation();
+
+            const char* run_frames[] =
+            {
+            "C:/Users/admin/source/repos/Temporintial/Temporintial/assets/player/running/1.png",
+            "C:/Users/admin/source/repos/Temporintial/Temporintial/assets/player/running/2.png",
+            "C:/Users/admin/source/repos/Temporintial/Temporintial/assets/player/running/3.png",
+            "C:/Users/admin/source/repos/Temporintial/Temporintial/assets/player/running/4.png",
+            "C:/Users/admin/source/repos/Temporintial/Temporintial/assets/player/running/5.png"
+            };
+
+            for (int i = 0; i < sizeof(run_frames) / sizeof(const char*); i++)
+            {
+                Sprite* run = new Sprite(renderer, run_frames[i]);
+                if (run)
+                {
+                    player_run->AddSprite(run);
+                }
+            }
+
+            player_run->id = ANIM_PLAYER_RUN;
+            player_run->speed = 8;
+            asset_mng->AddAnimation(player_run);
+        }
+
+        {
+            Animation* player_shoot = new Animation();
+
+            const char* shoot_frames[] =
+            {
+            "C:/Users/admin/source/repos/Temporintial/Temporintial/assets/player/shooting/1.png",
+            "C:/Users/admin/source/repos/Temporintial/Temporintial/assets/player/shooting/2.png",
+            "C:/Users/admin/source/repos/Temporintial/Temporintial/assets/player/shooting/3.png"
+            };
+
+            for (int i = 0; i < sizeof(shoot_frames) / sizeof(const char*); i++)
+            {
+                Sprite* shoot = new Sprite(renderer, shoot_frames[i]);
+                if (shoot)
+                {
+                    player_shoot->AddSprite(shoot);
+                }
+            }
+
+            player_shoot->id = ANIM_PLAYER_SHOOT;
+            player_shoot->speed = 9;
+            asset_mng->AddAnimation(player_shoot);
+        }
+
+        {
+            Animation* laser_bullet = new Animation();
+            Sprite* frame1 = new Sprite(renderer,
+"C:/Users/admin/source/repos/Temporintial/Temporintial/assets/player/shooting/laser_bullet.png");
+
+            laser_bullet->AddSprite(frame1);
+            laser_bullet->id = ANIM_LASER_BULLET;
+            asset_mng->AddAnimation(laser_bullet);
+        }
         
     }
 

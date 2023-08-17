@@ -38,6 +38,7 @@ struct Player : public Object
     Player(int x, int y, float scale);
     ~Player();
 
+    int dir = 1;
     int collision_dir = NONE;
     int sprite_indices_index = 0;
     float velocx = 0;
@@ -45,12 +46,17 @@ struct Player : public Object
     bool on_ground = false;
     int last_shot_elapsed = -1;
     SDL_RendererFlip flip = SDL_FLIP_NONE;
+    Animation* anim = nullptr;
+    int anim_play_tic = 0;
+    bool is_shooting = false;
 
     const int speed = 4;
     const int jump_force = 6;
 
     void Update() override;
     void Draw(SDL_Renderer* renderer) override;
+    void SetAnim(int anim_id);
+    void Shoot();
 };
 
 struct Projectile : public Object
