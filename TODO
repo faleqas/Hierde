@@ -10,3 +10,4 @@
     - Pack up all the stuff in main.cpp/h into a Game class
     - Rewrite velocity system in the player code
     - Clean up object system's inheritance stuff
+    - Fix collision bugs that occur when the player touches a tile above him
