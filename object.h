@@ -5,10 +5,19 @@
 
 struct ObjectManager;
 
+enum
+{
+    OBJECT_PLAYER,
+    OBJECT_TILE,
+    OBJECT_PROJECTILE,
+    OBJECT_ABDO
+};
+
 struct Object
 {
     int id = -1;
     int born_tic = 0;
+    int type = -1;
     bool active = true;
     int x = 0;
     int y = 0;
@@ -21,6 +30,7 @@ struct Object
 
     virtual void Update() {};
     virtual void Draw(SDL_Renderer* renderer) {};
+    virtual void OnCollision(Object* collider) {};
 };
 
 
@@ -73,6 +83,25 @@ struct Projectile : public Object
 
     void Update() override;
     void Draw(SDL_Renderer* renderer);
+};
+
+struct Abdo : public Object
+{
+    Abdo(int x, int y);
+
+    int collision_dir = NONE;
+    int dir = 0;
+    Animation* anim = nullptr;
+    bool on_ground = false;
+
+    float velocx = 0;
+    float velocy = 0;
+
+    const int speed = 1;
+
+    void Update() override;
+    void Draw(SDL_Renderer* renderer);
+    void OnCollision(Object* collider);
 };
 
 struct Tile : public Object

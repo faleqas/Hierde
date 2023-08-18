@@ -140,17 +140,27 @@ int main(int argc, char* argv[])
             laser_bullet->id = ANIM_LASER_BULLET;
             asset_mng->AddAnimation(laser_bullet);
         }
+
+        {
+            Animation* abdo = new Animation();
+            Sprite* frame1 = new Sprite(renderer,
+"C:/Users/admin/source/repos/Temporintial/Temporintial/assets/player/idle.png");
+
+            abdo->AddSprite(frame1);
+            abdo->id = ANIM_ABDO;
+            asset_mng->AddAnimation(abdo);
+        }
         
     }
 
     ObjectManager* object_mng = new ObjectManager();
-    int player_id = object_mng->AddObject(new Player(0, 0, 5.0f));
+    int player_id = object_mng->AddObject(new Player(200, 0, 5.0f));
     
     int tile_x = 0;
     int tile_y = 0;
     for (int i = 0; i < 10; i++)
     {
-        object_mng->AddObject(new Tile(19 * i * 5.0f, 400, 19, 13, 5.0f, tile_x, tile_y));
+        object_mng->AddObject(new Tile(19 * i * 5.0f, 400, 19, 13, 5.0f, 1, 0));
         tile_x++;
         if (tile_x >= 5)
         {
@@ -158,6 +168,8 @@ int main(int argc, char* argv[])
             tile_y++;
         }
     }
+
+    object_mng->AddObject(new Abdo(100, 100));
 
     while (true)
     {

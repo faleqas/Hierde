@@ -8,7 +8,8 @@ enum
     ANIM_PLAYER_RUN,
     ANIM_PLAYER_SHOOT,
     ANIM_LASER_BULLET,
-    ANIM_TILE
+    ANIM_TILE,
+    ANIM_ABDO
 };
 
 //const int PLAYER_WALK_INDICES[7] = {5, 3, 4, 5, 4, 3, 4};

@@ -153,6 +153,7 @@ Player::Player(int x, int y, float scale)
     this->y = y;
     this->w = 14 * scale;
     this->h = 24 * scale;
+    this->type = OBJECT_PLAYER;
 }
 
 
@@ -194,6 +195,7 @@ void Player::Update()
         {
             velocx = -speed;
             x += velocx;
+            velocx = 0;
             collision_dir = COL_DIR_RIGHT;
         }
     }
@@ -207,6 +209,7 @@ void Player::Update()
         {
             velocx = speed;
             x += velocx;
+            velocx = 0;
             collision_dir = COL_DIR_LEFT;
         }
     }
@@ -244,6 +247,14 @@ void Player::Draw(SDL_Renderer* renderer)
     }
     else
     {
+        if (dir == 1)
+        {
+            flip = SDL_FLIP_NONE;
+        }
+        else
+        {
+            flip = SDL_FLIP_HORIZONTAL;
+        }
         if (velocx > 0)
         {
             SetAnim(ANIM_PLAYER_RUN);
@@ -355,6 +366,7 @@ Tile::Tile(int x, int y, int w, int h, float scale, int tile_x, int tile_y)
     this->h = h * scale;
     this->tile_x = tile_x;
     this->tile_y = tile_y;
+    this->type = OBJECT_TILE;
 }
 
 void Tile::Draw(SDL_Renderer* renderer)
@@ -377,6 +389,7 @@ Projectile::Projectile(Object* parent, int x, int y, int w, int h, int dir, floa
     this->h = h;
     this->dir = dir;
     this->speed = speed;
+    this->type = OBJECT_PROJECTILE;
 }
 
 void Projectile::Update()
@@ -385,10 +398,13 @@ void Projectile::Update()
 
     this->x += speed * dir;
 
-    if (mng->IsColliding(this))
+    Object* collider = mng->IsColliding(this);
+    if (collider)
     {
         active = false;
         printf("dead\n");
+        collider->OnCollision(this);
+
     }
 
     else if ((tic - born_tic) > 2000)
@@ -410,10 +426,75 @@ void Projectile::Draw(SDL_Renderer* renderer)
 
 
 
+Abdo::Abdo(int x, int y)
+{
+    this->x = x;
+    this->y = y;
+    this->w = 48;
+    this->h = 300;
+    this->born_tic = Gametic();
+    this->type = OBJECT_ABDO;
+}
 
 
 
+void Abdo::Update()
+{
+    if (on_ground)
+    {
+        dir = 1;
+    }
+    velocx = speed * dir;
 
+    if (!mng->IsColliding(this))
+    {
+        velocy += GRAVITY;
+        y += velocy;
+        Object* collider = mng->IsColliding(this);
+        if (collider && !on_ground)
+        {
+            collision_dir = COL_DIR_DOWN;
+            y = collider->y - h;
+            velocy = 0;
+            on_ground = true;
+        }
+        else
+        {
+            on_ground = false;
+        }
+    }
+
+    if (velocy > GRAVITY * 10)
+    {
+        velocy = GRAVITY * 10;
+    }
+
+    x += velocx;
+    Object* collider = mng->IsColliding(this);
+    if (collider)
+    {
+        x -= velocx;
+        velocx = 0;
+    }
+}
+
+void Abdo::OnCollision(Object* collider)
+{
+    if (collider->type == OBJECT_PROJECTILE)
+    {
+        active = false;
+        mng->AddObject(new Abdo(100, -100));
+    }
+}
+
+
+void Abdo::Draw(SDL_Renderer* renderer)
+{
+    AssetManager* asset_mng = GetAssetMng();
+    Animation* anim = asset_mng->GetAnimation(ANIM_ABDO);
+
+    anim->Play(renderer, 0, x, y, w, h);
+}
 
 
 
