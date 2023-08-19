@@ -13,6 +13,12 @@ enum
     OBJECT_ABDO
 };
 
+enum
+{
+    COLLISION_AABB,
+    COLLISION_SAT
+};
+
 struct Object
 {
     int id = -1;
@@ -25,6 +31,7 @@ struct Object
     int h = 0;
     float scale = 1.0f; //drawing and collision scale
     ObjectManager* mng = nullptr;
+    int collision_type = COLLISION_AABB;
 
     Object();
 
