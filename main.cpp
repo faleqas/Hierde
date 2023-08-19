@@ -4,6 +4,9 @@
 #include "animation.h"
 #include "asset_manager.h"
 #include "object.h"
+#include "vector.h"
+#include "main.h"
+#include <algorithm>
 
 //NEXT: OBJECT HANDLING SYSTEM (CREATION, DELETION) DONE()
 
@@ -171,6 +174,18 @@ int main(int argc, char* argv[])
 
     object_mng->AddObject(new Abdo(100, 100));
 
+    SDL_Rect rect1 =
+    {
+        0, 0,
+        128, 128
+    };
+
+    SDL_Rect rect2 =
+    {
+        200, 10,
+        128, 128
+    };
+
     while (true)
     {
         int tick = SDL_GetTicks();
@@ -188,10 +203,48 @@ int main(int argc, char* argv[])
         if (delta > 1000/60.0)
         {
             object_mng->Update();
+
+            const uint8_t* state = SDL_GetKeyboardState(nullptr);
+            
+            if (state[SDL_SCANCODE_RIGHT])
+            {
+                rect1.x++;
+            }
+
+            if (state[SDL_SCANCODE_LEFT])
+            {
+                rect1.x--;
+            }
+
+            if (state[SDL_SCANCODE_UP])
+            {
+                rect1.y--;
+            }
+
+            if (state[SDL_SCANCODE_DOWN])
+            {
+                rect1.y++;
+            }
+
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             SDL_RenderClear(renderer);
 
             object_mng->Draw(renderer);
+
+            bool collide = SATCollision(rect1.x, rect1.y, rect1.w, rect1.h,
+                                rect2.x, rect2.y, rect2.w, rect2.h);
+
+            if (collide)
+            {
+                SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+            }
+            else
+            {
+                SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            }
+
+            SDL_RenderDrawRect(renderer, &rect1);
+            SDL_RenderDrawRect(renderer, &rect2);
             
             SDL_RenderPresent(renderer);
 
@@ -224,9 +277,181 @@ int Gametic()
     return tic;
 }
 
+
+bool SATCollision(float x1, float y1, float w1, float h1,
+                  float x2, float y2, float w2, float h2)
+{
+    Vector2 poly1[4] = {}; //vertices of first polygon
+    poly1[0] = {x1, y1};
+    poly1[1] = {x1 + w1, y1};
+    poly1[2] = {x1, y1 + h1};
+    poly1[3] = {x1 + w1, y1 + h1};
+
+    Vector2 poly2[4] = {}; //vertices of second polygon
+    poly2[0] = {x2, y2};
+    poly2[1] = {x2 + w2, y2};
+    poly2[2] = {x2, y2 + h2};
+    poly2[3] = {x2 + w2, y2 + h2};
+
+    Line poly1_sides[4] =
+    {
+        {
+            poly1[0], poly1[1]
+        },
+        {
+            poly1[1], poly2[3]
+        },
+        {
+            poly1[0], poly1[2]
+        },
+        {
+            poly1[2], poly1[3]
+        }
+    };
+
+    Line poly2_sides[4] =
+    {
+        {
+            poly2[0], poly2[1]
+        },
+        {
+            poly2[1], poly2[3]
+        },
+        {
+            poly2[0], poly2[2]
+        },
+        {
+            poly2[2], poly2[3]
+        }
+    };
+
+    for (int i = 0; i < 4; i++)
+    {
+        Line side = poly1_sides[i];
+
+        Vector2 axis = {
+            side.v2.x - side.v1.x,
+            side.v2.y - side.v1.y
+        };
+
+        Vector2 normal_axis = axis.Normalize();
+        normal_axis.Print();
+
+        float poly1_min = normal_axis.DotProduct(poly1[0]);
+        float poly1_max = poly1_min;
+
+        for (int i = 0; i < 4; i++)
+        {
+            Vector2 vertex = poly1[i];
+            if (normal_axis.x)
+            {
+                poly1_min = std::min(vertex.x, poly1_min);
+                poly1_max = std::max(vertex.x, poly1_max);
+            }
+            else
+            {
+                poly1_min = std::min(vertex.y, poly1_min);
+                poly1_max = std::max(vertex.y, poly1_max);
+            }
+        }
+
+        float poly2_min = normal_axis.DotProduct(poly2[0]);
+        float poly2_max = poly2_min;
+
+        for (int i = 0; i < 4; i++)
+        {
+            Vector2 vertex = poly2[i];
+            if (normal_axis.x)
+            {
+                poly2_min = std::min(vertex.x, poly2_min);
+                poly2_max = std::max(vertex.x, poly2_max);
+            }
+            else
+            {
+                poly2_min = std::min(vertex.y, poly2_min);
+                poly2_max = std::max(vertex.y, poly2_max);
+            }
+        }
+
+        Vector2 distance = {
+            poly1[0].x - poly2[0].x,
+            poly1[0].y - poly2[0].y
+        };
+
+        float projected_distance = normal_axis.DotProduct(distance);
+
+        // poly1_min += projected_distance;
+        // poly1_max += projected_distance;
+
+        bool gap_exists = ((poly1_min - poly2_max) > 0) || ((poly2_min - poly1_max) > 0);
+
+        if (gap_exists)
+        {
+            return false;
+        }
+    }
+
+    for (int i = 0; i < 4; i++)
+    {
+        Line side = poly2_sides[i];
+
+        Vector2 axis = {
+            side.v2.x - side.v1.x,
+            side.v2.y - side.v1.y
+        };
+
+        Vector2 normal_axis = axis.Normalize();
+        normal_axis.Print();
+
+        float poly1_min = normal_axis.DotProduct(poly1[0]);
+        float poly1_max = poly1_min;
+
+        for (int i = 0; i < 4; i++)
+        {
+            Vector2 vertex = poly1[i];
+            poly1_min = std::min(vertex.x, poly1_min);
+            poly1_max = std::max(vertex.x, poly1_max);
+            poly1_min = std::min(vertex.y, poly1_min);
+            poly1_max = std::max(vertex.y, poly1_max);
+        }
+
+        float poly2_min = normal_axis.DotProduct(poly2[0]);
+        float poly2_max = poly2_min;
+
+        for (int i = 0; i < 4; i++)
+        {
+            Vector2 vertex = poly2[i];
+            poly2_min = std::min(vertex.x, poly2_min);
+            poly2_min = std::min(vertex.y, poly2_min);
+            poly2_max = std::max(vertex.x, poly2_max);
+            poly2_max = std::max(vertex.y, poly2_max);
+        }
+
+        Vector2 distance = {
+            poly1[0].x - poly2[0].x,
+            poly1[0].y - poly2[0].y
+        };
+
+        float projected_distance = normal_axis.DotProduct(distance);
+
+        poly1_min += projected_distance;
+        poly1_max += projected_distance;
+
+        bool gap_exists = ((poly1_min - poly2_max) > 0) || ((poly2_min - poly1_max) > 0);
+
+        if (gap_exists)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool CheckAABBCol(int x1, int y1, int w1, int h1,
                   int x2, int y2, int w2, int h2)
 {
+
     if(x1 < x2 + w2 &&
         x1 + w1 > x2 &&
         y1 < y2 + h2 &&
