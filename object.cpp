@@ -9,7 +9,8 @@ Object::Object()
 }
 
 
-
+//This function always uses AABB collision for performance reasons
+//In the object's OnCollision function you can use SATCollision if needed
 Object* ObjectManager::IsColliding(Object* obj)
 {
     for (int i = 0; i < objects_count; i++)
@@ -17,10 +18,12 @@ Object* ObjectManager::IsColliding(Object* obj)
         Object* obj2 = _objects[i];
         if (obj2 && obj != obj2)
         {
-            if (CheckAABBCol(obj->x, obj->y, obj->w, obj->h,
-                             obj2->x, obj2->y, obj2->w, obj2->h))
             {
-                return obj2;
+                if (CheckAABBCol(obj->x, obj->y, obj->w, obj->h,
+                                obj2->x, obj2->y, obj2->w, obj2->h))
+                {
+                    return obj2;
+                }
             }
         }
     }
@@ -154,6 +157,7 @@ Player::Player(int x, int y, float scale)
     this->w = 14 * scale;
     this->h = 24 * scale;
     this->type = OBJECT_PLAYER;
+    this->collision_type = COLLISION_SAT;
 }
 
 

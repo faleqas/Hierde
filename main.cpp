@@ -231,8 +231,11 @@ int main(int argc, char* argv[])
 
             object_mng->Draw(renderer);
 
-            bool collide = SATCollision(rect1.x, rect1.y, rect1.w, rect1.h,
-                                rect2.x, rect2.y, rect2.w, rect2.h);
+            Vector2* rect1_vertices = AABBToVertices(rect1.x, rect1.y, rect1.w, rect1.h);
+            Vector2* rect2_vertices = AABBToVertices(rect2.x, rect2.y, rect2.w, rect2.h);
+            bool collide = SATCollision(rect1_vertices, 4, rect2_vertices, 4);
+            free(rect1_vertices);
+            free(rect2_vertices);
 
             if (collide)
             {
@@ -278,52 +281,37 @@ int Gametic()
 }
 
 
-bool SATCollision(float x1, float y1, float w1, float h1,
-                  float x2, float y2, float w2, float h2)
+bool SATCollision(Vector2* poly1, int poly1_len,
+                  Vector2* poly2, int poly2_len)
 {
-    Vector2 poly1[4] = {}; //vertices of first polygon
-    poly1[0] = {x1, y1};
-    poly1[1] = {x1 + w1, y1};
-    poly1[2] = {x1, y1 + h1};
-    poly1[3] = {x1 + w1, y1 + h1};
-
-    Vector2 poly2[4] = {}; //vertices of second polygon
-    poly2[0] = {x2, y2};
-    poly2[1] = {x2 + w2, y2};
-    poly2[2] = {x2, y2 + h2};
-    poly2[3] = {x2 + w2, y2 + h2};
-
-    Line poly1_sides[4] =
+    Line* poly1_sides = nullptr;
+    Line* poly2_sides = nullptr;
+    if (poly1_len == 4)
     {
-        {
-            poly1[0], poly1[1]
-        },
-        {
-            poly1[1], poly2[3]
-        },
-        {
-            poly1[0], poly1[2]
-        },
-        {
-            poly1[2], poly1[3]
-        }
-    };
-
-    Line poly2_sides[4] =
+        poly1_sides = (Line*)calloc(poly1_len, sizeof(Line));
+        poly1_sides[0] = {poly1[0], poly1[1]};
+        poly1_sides[1] = {poly1[1], poly1[3]};
+        poly1_sides[2] = {poly1[0], poly1[2]};
+        poly1_sides[3] = {poly1[2], poly1[3]};
+    }
+    else
     {
-        {
-            poly2[0], poly2[1]
-        },
-        {
-            poly2[1], poly2[3]
-        },
-        {
-            poly2[0], poly2[2]
-        },
-        {
-            poly2[2], poly2[3]
-        }
-    };
+        return false;
+    }
+
+    if (poly2_len == 4)
+    {
+        poly2_sides = (Line*)calloc(poly2_len, sizeof(Line));
+        poly2_sides[0] = {poly2[0], poly2[1]};
+        poly2_sides[1] = {poly2[1], poly2[3]};
+        poly2_sides[2] = {poly2[0], poly2[2]};
+        poly2_sides[3] = {poly2[2], poly2[3]};
+    }
+    else
+    {
+        return false;
+    }
+
 
     for (int i = 0; i < 4; i++)
     {
@@ -441,10 +429,13 @@ bool SATCollision(float x1, float y1, float w1, float h1,
 
         if (gap_exists)
         {
+            free(poly1_sides);
+            free(poly2_sides);
             return false;
         }
     }
-
+    free(poly1_sides);
+    free(poly2_sides);
     return true;
 }
 
@@ -463,4 +454,17 @@ bool CheckAABBCol(int x1, int y1, int w1, int h1,
     {
         return false;
     }
+}
+
+//FREE IT YOURSELF
+Vector2* AABBToVertices(float x, float y, float w, float h)
+{
+    Vector2* vertices = (Vector2*)calloc(4, sizeof(Vector2));
+
+    vertices[0] = {x, y};
+    vertices[1] = {x + w, y};
+    vertices[2] = {x, y + h};
+    vertices[3] = {x + w, y + h};
+
+    return vertices;
 }
