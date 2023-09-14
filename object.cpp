@@ -55,6 +55,11 @@ int ObjectManager::AddObject(Object* obj)
         _objects = (Object**)malloc(sizeof(Object*) * objects_count);
     }
     _objects[objects_count-1] = obj;
+
+    if (obj->type == OBJECT_PLAYER)
+    {
+        player = (Player*)obj;
+    }
     return obj->id;
 }
 
@@ -120,6 +125,10 @@ void ObjectManager::Update()
     {
         clean_inactive = true;
     }
+
+    camera.Follow(player);
+    camera.Update();
+
     for (int i = 0; i < objects_count; i++)
     {
         if (_objects[i])
@@ -128,7 +137,7 @@ void ObjectManager::Update()
             {
                 _objects[i]->Update();
             }
-            else
+            else if (clean_inactive)
             {
                 delete _objects[i];
                 _objects[i] = nullptr;
@@ -143,7 +152,7 @@ void ObjectManager::Draw(SDL_Renderer* renderer)
     {
         if (_objects[i] && _objects[i]->active)
         {
-            _objects[i]->Draw(renderer);
+            _objects[i]->Draw(renderer, &camera);
         }
     }
 }
@@ -243,7 +252,7 @@ void Player::Update()
     }
 }
 
-void Player::Draw(SDL_Renderer* renderer)
+void Player::Draw(SDL_Renderer* renderer, Camera* camera)
 {
     if (is_shooting)
     {
@@ -320,6 +329,11 @@ void Player::Draw(SDL_Renderer* renderer)
         } break;
     };
 
+    if (camera)
+    {
+        camera->AdjustPosToCamera(&draw_x, &draw_y);
+    }
+
     anim->Play(renderer, anim_play_tic, draw_x, draw_y, draw_w, draw_h);
 
     anim_play_tic++;
@@ -373,12 +387,20 @@ Tile::Tile(int x, int y, int w, int h, float scale, int tile_x, int tile_y)
     this->type = OBJECT_TILE;
 }
 
-void Tile::Draw(SDL_Renderer* renderer)
+void Tile::Draw(SDL_Renderer* renderer, Camera* camera)
 {
     AssetManager* asset_mng = GetAssetMng();
     Animation* anim = asset_mng->GetAnimation(ANIM_TILE);
 
-    anim->DrawTile(0, tile_x, tile_y, renderer, x, y, w, h, SDL_FLIP_NONE);
+    int draw_x = x;
+    int draw_y = y;
+
+    if (camera)
+    {
+        camera->AdjustPosToCamera(&draw_x, &draw_y);
+    }
+
+    anim->DrawTile(0, tile_x, tile_y, renderer, draw_x, draw_y, w, h, SDL_FLIP_NONE);
 }
 
 Projectile::Projectile(Object* parent, int x, int y, int w, int h, int dir, float scale, int speed)
@@ -419,23 +441,31 @@ void Projectile::Update()
 }
 
 
-void Projectile::Draw(SDL_Renderer* renderer)
+void Projectile::Draw(SDL_Renderer* renderer, Camera* camera)
 {
     AssetManager* asset_mng = GetAssetMng();
     Animation* anim = asset_mng->GetAnimation(ANIM_LASER_BULLET);
 
-    anim->Play(renderer, 0, x, y, w, h);
+    int draw_x = x;
+    int draw_y = y;
+
+    if (camera)
+    {
+        camera->AdjustPosToCamera(&draw_x, &draw_y);
+    }
+
+    anim->Play(renderer, 0, draw_x, draw_y, w, h);
 }
 
 
 
 
-Abdo::Abdo(int x, int y)
+Abdo::Abdo(int x, int y, float scale)
 {
     this->x = x;
     this->y = y;
-    this->w = 48;
-    this->h = 300;
+    this->w = 14 * scale;
+    this->h = 36 * scale;
     this->born_tic = Gametic();
     this->type = OBJECT_ABDO;
 }
@@ -487,17 +517,25 @@ void Abdo::OnCollision(Object* collider)
     if (collider->type == OBJECT_PROJECTILE)
     {
         active = false;
-        mng->AddObject(new Abdo(100, -100));
+        mng->AddObject(new Abdo(100, -100, 5.0f));
     }
 }
 
 
-void Abdo::Draw(SDL_Renderer* renderer)
+void Abdo::Draw(SDL_Renderer* renderer, Camera* camera)
 {
     AssetManager* asset_mng = GetAssetMng();
     Animation* anim = asset_mng->GetAnimation(ANIM_ABDO);
 
-    anim->Play(renderer, 0, x, y, w, h);
+    int draw_x = x;
+    int draw_y = y;
+
+    if (camera)
+    {
+        camera->AdjustPosToCamera(&draw_x, &draw_y);
+    }
+
+    anim->Play(renderer, 0, draw_x, draw_y, w, h);
 }
 
 

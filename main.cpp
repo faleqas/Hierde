@@ -18,8 +18,8 @@ int main(int argc, char* argv[])
 {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
 
-    SDL_Window* window = SDL_CreateWindow("Window", 100, 100, 800, 600, 0);
-    SDL_Rect window_rect = {0, 0, 800, 600};
+    SDL_Window* window = SDL_CreateWindow("Window", 100, 100, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
+    
 
     if (!window)
     {
@@ -172,7 +172,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    object_mng->AddObject(new Abdo(100, 100));
+    object_mng->AddObject(new Abdo(100, 100, 5.0f));
 
     SDL_Rect rect1 =
     {
@@ -208,22 +208,22 @@ int main(int argc, char* argv[])
             
             if (state[SDL_SCANCODE_RIGHT])
             {
-                rect1.x++;
+                rect1.x += 4;
             }
 
             if (state[SDL_SCANCODE_LEFT])
             {
-                rect1.x--;
+                rect1.x -= 4;
             }
 
             if (state[SDL_SCANCODE_UP])
             {
-                rect1.y--;
+                rect1.y -= 4;
             }
 
             if (state[SDL_SCANCODE_DOWN])
             {
-                rect1.y++;
+                rect1.y += 4;
             }
 
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -231,21 +231,21 @@ int main(int argc, char* argv[])
 
             object_mng->Draw(renderer);
 
-            Vector2* rect1_vertices = AABBToVertices(rect1.x, rect1.y, rect1.w, rect1.h);
-            DrawVertices(renderer, rect1_vertices, 4);
-            Vector2* rect2_vertices = AABBToVertices(rect2.x, rect2.y, rect2.w, rect2.h);
-            bool collide = SATCollision(rect1_vertices, 3, rect2_vertices, 4);
-            free(rect1_vertices);
-            free(rect2_vertices);
+            // Vector2* rect1_vertices = AABBToVertices(rect1.x, rect1.y, rect1.w, rect1.h);
+            // DrawVertices(renderer, rect1_vertices, 4);
+            // Vector2* rect2_vertices = AABBToVertices(rect2.x, rect2.y, rect2.w, rect2.h);
+            // bool collide = SATCollision(rect1_vertices, 4, rect2_vertices, 4);
+            // free(rect1_vertices);
+            // free(rect2_vertices);
 
-            if (collide)
-            {
-                SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
-            }
-            else
-            {
-                SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-            }
+            // if (collide)
+            // {
+            //     SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+            // }
+            // else
+            // {
+            //     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            // }
 
             //SDL_RenderDrawRect(renderer, &rect1);
             SDL_RenderDrawRect(renderer, &rect2);
@@ -319,8 +319,8 @@ bool SATCollision(Vector2* poly1, int poly1_len,
     {
         poly1_sides = (Line*)calloc(poly1_len, sizeof(Line));
         poly1_sides[0] = {poly1[0], poly1[1]};
-        poly1_sides[1] = {poly1[1], poly1[3]};
-        poly1_sides[2] = {poly1[0], poly1[2]};
+        poly1_sides[1] = {poly1[3], poly1[1]};
+        poly1_sides[2] = {poly1[2], poly1[0]};
         poly1_sides[3] = {poly1[2], poly1[3]};
         poly1_sides_count = 4;
     }
@@ -341,8 +341,8 @@ bool SATCollision(Vector2* poly1, int poly1_len,
     {
         poly2_sides = (Line*)calloc(poly2_len, sizeof(Line));
         poly2_sides[0] = {poly2[0], poly2[1]};
-        poly2_sides[1] = {poly2[1], poly2[3]};
-        poly2_sides[2] = {poly2[0], poly2[2]};
+        poly2_sides[1] = {poly2[3], poly2[1]};
+        poly2_sides[2] = {poly2[2], poly2[0]};
         poly2_sides[3] = {poly2[2], poly2[3]};
         poly1_sides_count = 4;
     }
@@ -365,8 +365,8 @@ bool SATCollision(Vector2* poly1, int poly1_len,
         Line side = poly1_sides[i];
 
         Vector2 axis = {
-            side.v2.x - side.v1.x,
-            side.v2.y - side.v1.y
+            -(side.v2.y - side.v1.y),
+            side.v2.x - side.v1.x
         };
 
         Vector2 normal_axis = axis.Normalize();
@@ -383,7 +383,7 @@ bool SATCollision(Vector2* poly1, int poly1_len,
                 poly1_min = std::min(vertex.x, poly1_min);
                 poly1_max = std::max(vertex.x, poly1_max);
             }
-            else
+            if (normal_axis.y)
             {
                 poly1_min = std::min(vertex.y, poly1_min);
                 poly1_max = std::max(vertex.y, poly1_max);
@@ -401,7 +401,7 @@ bool SATCollision(Vector2* poly1, int poly1_len,
                 poly2_min = std::min(vertex.x, poly2_min);
                 poly2_max = std::max(vertex.x, poly2_max);
             }
-            else
+            if (normal_axis.y)
             {
                 poly2_min = std::min(vertex.y, poly2_min);
                 poly2_max = std::max(vertex.y, poly2_max);
@@ -422,6 +422,8 @@ bool SATCollision(Vector2* poly1, int poly1_len,
 
         if (gap_exists)
         {
+            free(poly1_sides);
+            free(poly2_sides);
             return false;
         }
     }
@@ -431,8 +433,8 @@ bool SATCollision(Vector2* poly1, int poly1_len,
         Line side = poly2_sides[i];
 
         Vector2 axis = {
-            side.v2.x - side.v1.x,
-            side.v2.y - side.v1.y
+            -(side.v2.y - side.v1.y),
+            side.v2.x - side.v1.x
         };
 
         Vector2 normal_axis = axis.Normalize();
@@ -444,10 +446,16 @@ bool SATCollision(Vector2* poly1, int poly1_len,
         for (int i = 0; i < poly1_len; i++)
         {
             Vector2 vertex = poly1[i];
-            poly1_min = std::min(vertex.x, poly1_min);
-            poly1_max = std::max(vertex.x, poly1_max);
-            poly1_min = std::min(vertex.y, poly1_min);
-            poly1_max = std::max(vertex.y, poly1_max);
+            if (normal_axis.x)
+            {
+                poly1_min = std::min(vertex.x, poly1_min);
+                poly1_max = std::max(vertex.x, poly1_max);
+            }
+            if (normal_axis.y)
+            {
+                poly1_min = std::min(vertex.y, poly1_min);
+                poly1_max = std::max(vertex.y, poly1_max);
+            }
         }
 
         float poly2_min = normal_axis.DotProduct(poly2[0]);
@@ -456,10 +464,16 @@ bool SATCollision(Vector2* poly1, int poly1_len,
         for (int i = 0; i < poly2_len; i++)
         {
             Vector2 vertex = poly2[i];
-            poly2_min = std::min(vertex.x, poly2_min);
-            poly2_min = std::min(vertex.y, poly2_min);
-            poly2_max = std::max(vertex.x, poly2_max);
-            poly2_max = std::max(vertex.y, poly2_max);
+            if (normal_axis.x)
+            {
+                poly2_min = std::min(vertex.x, poly2_min);
+                poly2_max = std::max(vertex.x, poly2_max);
+            }
+            if (normal_axis.y)
+            {
+                poly2_min = std::min(vertex.y, poly2_min);
+                poly2_max = std::max(vertex.y, poly2_max);
+            }
         }
 
         Vector2 distance = {

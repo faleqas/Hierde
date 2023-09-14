@@ -1,7 +1,8 @@
-
+#pragma once
 #ifndef __OBJECT
 #define __OBJECT
 #include "animation.h"
+#include "camera.h"
 
 struct ObjectManager;
 
@@ -36,7 +37,7 @@ struct Object
     Object();
 
     virtual void Update() {};
-    virtual void Draw(SDL_Renderer* renderer) {};
+    virtual void Draw(SDL_Renderer* renderer, Camera* camera) {};
     virtual void OnCollision(Object* collider) {};
 };
 
@@ -71,7 +72,7 @@ struct Player : public Object
     const int jump_force = 6;
 
     void Update() override;
-    void Draw(SDL_Renderer* renderer) override;
+    void Draw(SDL_Renderer* renderer, Camera* camera) override;
     void SetAnim(int anim_id);
     void Shoot();
 };
@@ -89,12 +90,12 @@ struct Projectile : public Object
     int dir = 1;
 
     void Update() override;
-    void Draw(SDL_Renderer* renderer);
+    void Draw(SDL_Renderer* renderer, Camera* camera);
 };
 
 struct Abdo : public Object
 {
-    Abdo(int x, int y);
+    Abdo(int x, int y, float scale);
 
     int collision_dir = NONE;
     int dir = 0;
@@ -107,7 +108,7 @@ struct Abdo : public Object
     const int speed = 1;
 
     void Update() override;
-    void Draw(SDL_Renderer* renderer);
+    void Draw(SDL_Renderer* renderer, Camera* camera);
     void OnCollision(Object* collider);
 };
 
@@ -117,7 +118,7 @@ struct Tile : public Object
     int tile_x = 0;
     int tile_y = 0;
 
-    void Draw(SDL_Renderer* renderer) override;
+    void Draw(SDL_Renderer* renderer, Camera* camera) override;
 };
 
 struct ObjectManager
@@ -125,6 +126,8 @@ struct ObjectManager
     Object** _objects = nullptr;
     int objects_count = 0;
     int _objects_added = 0; //number of objects added since the start. used to generate ID
+    Camera camera;
+    Player* player = NULL;
 
     int AddObject(Object* obj); //returns object id for future use
     Object* GetObject(int id);
