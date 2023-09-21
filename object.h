@@ -26,19 +26,22 @@ struct Object
     int born_tic = 0;
     int type = -1;
     bool active = true;
-    int x = 0;
-    int y = 0;
-    int w = 0;
-    int h = 0;
+    float x = 0;
+    float y = 0;
+    float w = 0;
+    float h = 0;
     float scale = 1.0f; //drawing and collision scale
     ObjectManager* mng = nullptr;
     int collision_type = COLLISION_AABB;
+
+    const float gravity = 0.08f;
 
     Object();
 
     virtual void Update() {};
     virtual void Draw(SDL_Renderer* renderer, Camera* camera) {};
     virtual void OnCollision(Object* collider) {};
+    Object* TestMove(float velocx, float velocy); //true if the move causes a collision
 };
 
 
@@ -53,14 +56,16 @@ enum
 
 struct Player : public Object
 {
-    Player(int x, int y, float scale);
+    Player(float x, float y, float scale);
     ~Player();
 
     int dir = 1;
     int collision_dir = NONE;
     int sprite_indices_index = 0;
+
     float velocx = 0;
     float velocy = 0;
+
     bool on_ground = false;
     int last_shot_elapsed = -1;
     SDL_RendererFlip flip = SDL_FLIP_NONE;
@@ -68,8 +73,10 @@ struct Player : public Object
     int anim_play_tic = 0;
     bool is_shooting = false;
 
-    const int speed = 4;
-    const int jump_force = 6;
+    const float speed = 1.9f;
+    const float jump_force = 2.3f;
+    const float acceleration = 0.2f;
+    const float friction = 0.2f;
 
     void Update() override;
     void Draw(SDL_Renderer* renderer, Camera* camera) override;
@@ -79,13 +86,13 @@ struct Player : public Object
 
 struct Projectile : public Object
 {
-    Projectile(Object* parent, int x, int y, int w, int h, int dir, float scale, int speed = 8);
+    Projectile(Object* parent, float x, float y, int w, int h, int dir, float scale, float speed = 8);
 
     Object* parent = nullptr;
 
     SDL_RendererFlip flip = SDL_FLIP_NONE;
 
-    int speed = 4;
+    float speed = 4;
 
     int dir = 1;
 
@@ -95,7 +102,7 @@ struct Projectile : public Object
 
 struct Abdo : public Object
 {
-    Abdo(int x, int y, float scale);
+    Abdo(float x, float y, float scale);
 
     int collision_dir = NONE;
     int dir = 0;
@@ -105,7 +112,7 @@ struct Abdo : public Object
     float velocx = 0;
     float velocy = 0;
 
-    const int speed = 1;
+    const float speed = 1;
 
     void Update() override;
     void Draw(SDL_Renderer* renderer, Camera* camera);

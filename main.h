@@ -12,8 +12,8 @@ bool SATCollision(Vector2* poly1, int poly1_len,
 Vector2* AABBToVertices(float x, float y, float w, float h);
 void DrawVertices(SDL_Renderer* renderer, Vector2* vertices, int len);
 
-const int WINDOW_WIDTH = 800;
-const int WINDOW_HEIGHT = 600;
+const int WINDOW_WIDTH = 1280;
+const int WINDOW_HEIGHT = 720;
 
 const float GRAVITY = 0.35f;
 

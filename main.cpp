@@ -157,13 +157,13 @@ int main(int argc, char* argv[])
     }
 
     ObjectManager* object_mng = new ObjectManager();
-    int player_id = object_mng->AddObject(new Player(200, 0, 5.0f));
+    int player_id = object_mng->AddObject(new Player(200, 0, 3.0f));
     
     int tile_x = 0;
     int tile_y = 0;
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 50; i++)
     {
-        object_mng->AddObject(new Tile(19 * i * 5.0f, 400, 19, 13, 5.0f, 1, 0));
+        object_mng->AddObject(new Tile(19 * i * 3.0f, 400, 19, 13, 3.0f, 1, 0));
         tile_x++;
         if (tile_x >= 5)
         {
@@ -172,7 +172,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    object_mng->AddObject(new Abdo(100, 100, 5.0f));
+    object_mng->AddObject(new Abdo(100, 100, 3.5f));
 
     SDL_Rect rect1 =
     {
@@ -206,25 +206,25 @@ int main(int argc, char* argv[])
 
             const uint8_t* state = SDL_GetKeyboardState(nullptr);
             
-            if (state[SDL_SCANCODE_RIGHT])
-            {
-                rect1.x += 4;
-            }
+            // if (state[SDL_SCANCODE_RIGHT])
+            // {
+            //     rect1.x += 4;
+            // }
 
-            if (state[SDL_SCANCODE_LEFT])
-            {
-                rect1.x -= 4;
-            }
+            // if (state[SDL_SCANCODE_LEFT])
+            // {
+            //     rect1.x -= 4;
+            // }
 
-            if (state[SDL_SCANCODE_UP])
-            {
-                rect1.y -= 4;
-            }
+            // if (state[SDL_SCANCODE_UP])
+            // {
+            //     rect1.y -= 4;
+            // }
 
-            if (state[SDL_SCANCODE_DOWN])
-            {
-                rect1.y += 4;
-            }
+            // if (state[SDL_SCANCODE_DOWN])
+            // {
+            //     rect1.y += 4;
+            // }
 
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             SDL_RenderClear(renderer);

@@ -8,6 +8,30 @@ Object::Object()
     born_tic = Gametic();
 }
 
+Object* Object::TestMove(float velocx, float velocy)
+{
+    if (mng)
+    {
+        x += velocx;
+        y += velocy;
+
+        Object* obj = mng->IsColliding(this);
+        if (obj)
+        {
+            x -= velocx;
+            y -= velocy;
+            return obj;
+        }
+        else
+        {
+            return NULL;
+        }
+    }
+    else
+    {
+        return NULL;
+    }
+}
 
 //This function always uses AABB collision for performance reasons
 //In the object's OnCollision function you can use SATCollision if needed
@@ -157,7 +181,7 @@ void ObjectManager::Draw(SDL_Renderer* renderer)
     }
 }
 
-Player::Player(int x, int y, float scale)
+Player::Player(float x, float y, float scale)
 {
     born_tic = Gametic();
     this->scale = scale;
@@ -176,67 +200,72 @@ void Player::Update()
 
     is_shooting = (last_shot_elapsed < 38) && (last_shot_elapsed > 0);
 
-    if (!mng->IsColliding(this))
-    {
-        velocy += GRAVITY;
-        y += velocy;
-        Object* collider = mng->IsColliding(this);
-        if (collider && !on_ground)
-        {
-            collision_dir = COL_DIR_DOWN;
-            y = collider->y - h;
-            velocy = 0;
-            on_ground = true;
-        }
-        else
-        {
-            on_ground = false;
-        }
-    }
+    velocy += gravity;
 
-    if (is_shooting)
+    if (state[SDL_SCANCODE_D])
     {
-
-    }
-
-    else if (state[SDL_SCANCODE_D])
-    {
-        dir = 1;
-        velocx = speed;
-        x += velocx;
-        if (mng->IsColliding(this))
-        {
-            velocx = -speed;
-            x += velocx;
-            velocx = 0;
-            collision_dir = COL_DIR_RIGHT;
-        }
-    }
-
-    else if (state[SDL_SCANCODE_A])
-    {
-        dir = -1;
-        velocx = -speed;
-        x += velocx;
-        if (mng->IsColliding(this))
+        velocx += acceleration;
+        if (velocx >= speed)
         {
             velocx = speed;
-            x += velocx;
-            velocx = 0;
-            collision_dir = COL_DIR_LEFT;
         }
+        dir = 1;
     }
-
+    else if (state[SDL_SCANCODE_A])
+    {
+        velocx -= acceleration;
+        if (velocx <= -speed)
+        {
+            velocx = -speed;
+        }
+        dir = -1;
+    }
     else
     {
-        velocx = 0;
+        if (velocx < 0)
+        {
+            velocx += friction;
+            if (velocx > 0)
+            {
+                velocx = 0;
+            }
+        }
+        else if (velocx > 0)
+        {
+            velocx -= friction;
+            if (velocx < 0)
+            {
+                velocx = 0;
+            }
+        }
     }
 
     if (state[SDL_SCANCODE_SPACE] && on_ground)
     {
-        on_ground = false;
         velocy = -jump_force;
+    }
+
+    if (!TestMove(velocx, 0))
+    {
+        x += velocx;
+    }
+
+    if (!TestMove(0, velocy))
+    {
         y += velocy;
+        on_ground = false;
+    }
+    else
+    {
+        if (velocy > 0)
+        {
+            Object* col = TestMove(0, velocy);
+            if (col)
+            {
+                y = col->y - h;
+                on_ground = true;
+            }
+        }
     }
 
     if (state[SDL_SCANCODE_X])
@@ -319,7 +348,7 @@ void Player::Draw(SDL_Renderer* renderer, Camera* camera)
             anim->loop = false;
             if (anim->since_done == 7)
             {
-                Shoot();
+                Shoot(); //WHY IS THIS IN DRAW()
             }
         } break;
 
@@ -366,12 +395,12 @@ void Player::Shoot()
     }
     else
     {
-        proj_x -= 24;
+        proj_x -= w / 2;
     }
     
     int proj_y = y + 3 * scale;
-    Projectile* proj = new Projectile(this, proj_x, proj_y, 24, 12,
-                                        dir, 1);
+    Projectile* proj = new Projectile(this, proj_x, proj_y, 4, 2,
+                                        dir, scale);
     mng->AddObject(proj);
 }
 
@@ -403,7 +432,7 @@ void Tile::Draw(SDL_Renderer* renderer, Camera* camera)
     anim->DrawTile(0, tile_x, tile_y, renderer, draw_x, draw_y, w, h, SDL_FLIP_NONE);
 }
 
-Projectile::Projectile(Object* parent, int x, int y, int w, int h, int dir, float scale, int speed)
+Projectile::Projectile(Object* parent, float x, float y, int w, int h, int dir, float scale, float speed)
 {
     born_tic = Gametic();
     printf("new projectile\n");
@@ -411,8 +440,8 @@ Projectile::Projectile(Object* parent, int x, int y, int w, int h, int dir, floa
     this->x = x;
     this->y = y;
     this->scale = scale;
-    this->w = w;
-    this->h = h;
+    this->w = w * scale;
+    this->h = h * scale;
     this->dir = dir;
     this->speed = speed;
     this->type = OBJECT_PROJECTILE;
@@ -460,12 +489,12 @@ void Projectile::Draw(SDL_Renderer* renderer, Camera* camera)
 
 
 
-Abdo::Abdo(int x, int y, float scale)
+Abdo::Abdo(float x, float y, float scale)
 {
     this->x = x;
     this->y = y;
-    this->w = 14 * scale;
-    this->h = 36 * scale;
+    this->w = 12 * scale;
+    this->h = 24 * scale;
     this->born_tic = Gametic();
     this->type = OBJECT_ABDO;
 }
