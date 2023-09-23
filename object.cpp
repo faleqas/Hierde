@@ -283,12 +283,10 @@ void Player::Update()
                 if (velocx > 0)
                 {
                     x = col->x - w;
-                    velocx = 0;
                 }
                 else if (velocx < 0)
                 {
                     x = col->x + col->w;
-                    velocx = 0;
                 }
             }
         }
@@ -310,7 +308,7 @@ void Player::Update()
                 float feet_y = (y + h);
                 if ((feet_y - col->y) < 5)
                 {
-                    y = col->y - h  ;
+                    y = col->y - h;
                     on_ground = true;
                 }
             }
@@ -545,6 +543,7 @@ Abdo::Abdo(float x, float y, float scale)
     this->y = y;
     this->w = 12 * scale;
     this->h = 20 * scale;
+    this->scale = scale;
     this->born_tic = Gametic();
     this->type = OBJECT_ABDO;
 }
