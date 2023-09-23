@@ -21,15 +21,15 @@ void Camera::Update()
 
     int realx = (x + target->w) - screen_x;
     
-    if (realx > WINDOW_WIDTH)
+    if (realx > WINDOW_WIDTH * 0.7f)
     {
-        screen_x = x - WINDOW_WIDTH + target->w;
+        screen_x = x - (WINDOW_WIDTH * 0.7f) + target->w;
     }
 
     realx = (x - screen_x);
-    if (realx < 0)
+    if (realx < WINDOW_WIDTH * 0.2F)
     {
-        screen_x = x;
+        screen_x = x - (WINDOW_WIDTH * 0.2f);
     }
 
 }

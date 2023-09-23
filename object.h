@@ -74,7 +74,7 @@ struct Player : public Object
     bool is_shooting = false;
 
     const float speed = 1.9f;
-    const float jump_force = 2.3f;
+    const float jump_force = 2.5f;
     const float acceleration = 0.2f;
     const float friction = 0.2f;
 

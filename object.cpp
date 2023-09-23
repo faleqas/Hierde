@@ -200,7 +200,21 @@ void Player::Update()
 
     is_shooting = (last_shot_elapsed < 38) && (last_shot_elapsed > 0);
 
-    velocy += gravity;
+    if (!on_ground)
+    {
+        if (!is_shooting)
+        {
+            velocy += gravity;
+        }
+        else if (velocy > 0)
+        {
+            velocy += gravity;
+        }
+    }
+    else
+    {
+        velocy = 0;
+    }
 
     if (state[SDL_SCANCODE_D])
     {
@@ -245,9 +259,39 @@ void Player::Update()
         velocy = -jump_force;
     }
 
+    if (is_shooting)
+    {
+        velocx = 0;
+        if (velocy <= 0)
+        {
+            velocy = 0;
+        }
+    }
+
     if (!TestMove(velocx, 0))
     {
         x += velocx;
+    }
+    else
+    {
+        Object* col = TestMove(velocx, 0);
+        if (col)
+        {
+            float feet_y = (y + h);
+            if ((feet_y - col->y) > 5)
+            {
+                if (velocx > 0)
+                {
+                    x = col->x - w;
+                    velocx = 0;
+                }
+                else if (velocx < 0)
+                {
+                    x = col->x + col->w;
+                    velocx = 0;
+                }
+            }
+        }
     }
 
     if (!TestMove(0, velocy))
@@ -259,14 +303,20 @@ void Player::Update()
     {
         if (velocy > 0)
         {
+            on_ground = true;
             Object* col = TestMove(0, velocy);
             if (col)
             {
-                y = col->y - h;
-                on_ground = true;
+                float feet_y = (y + h);
+                if ((feet_y - col->y) < 5)
+                {
+                    y = col->y - h  ;
+                    on_ground = true;
+                }
             }
         }
     }
+    printf("%d\n", on_ground);
 
     if (state[SDL_SCANCODE_X])
     {
@@ -494,7 +544,7 @@ Abdo::Abdo(float x, float y, float scale)
     this->x = x;
     this->y = y;
     this->w = 12 * scale;
-    this->h = 24 * scale;
+    this->h = 20 * scale;
     this->born_tic = Gametic();
     this->type = OBJECT_ABDO;
 }
@@ -546,7 +596,7 @@ void Abdo::OnCollision(Object* collider)
     if (collider->type == OBJECT_PROJECTILE)
     {
         active = false;
-        mng->AddObject(new Abdo(100, -100, 5.0f));
+        mng->AddObject(new Abdo(100, -100, scale));
     }
 }
 
