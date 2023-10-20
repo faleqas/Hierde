@@ -35,6 +35,8 @@ struct Object
     int collision_type = COLLISION_AABB;
 
     const float gravity = 0.08f;
+    float velocx = 0;
+    float velocy = 0;
 
     Object();
 
@@ -62,9 +64,6 @@ struct Player : public Object
     int dir = 1;
     int collision_dir = NONE;
     int sprite_indices_index = 0;
-
-    float velocx = 0;
-    float velocy = 0;
 
     bool on_ground = false;
     int last_shot_elapsed = -1;

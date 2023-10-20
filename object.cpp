@@ -136,7 +136,7 @@ void ObjectManager::DeleteObjects()
     _objects = nullptr;
 }
 
-//TODO() Clean up all inactive objects every few frames
+
 void ObjectManager::Update()
 {
     int tic = Gametic();
@@ -292,7 +292,8 @@ void Player::Update()
         }
     }
 
-    if (!TestMove(0, velocy))
+    Object* col = TestMove(0, velocy);
+    if (!col)
     {
         y += velocy;
         on_ground = false;
@@ -302,19 +303,19 @@ void Player::Update()
         if (velocy > 0)
         {
             on_ground = true;
-            Object* col = TestMove(0, velocy);
+            
             if (col)
             {
                 float feet_y = (y + h);
-                if ((feet_y - col->y) < 5)
+                if ((feet_y - col->y) > 1)
                 {
                     y = col->y - h;
                     on_ground = true;
+                    printf("%f vs %f\n", feet_y, col->y);
                 }
             }
         }
     }
-    printf("%d\n", on_ground);
 
     if (state[SDL_SCANCODE_X])
     {
@@ -326,6 +327,19 @@ void Player::Update()
     if (last_shot_elapsed >= 0) //shot even once since start
     {
         last_shot_elapsed++;
+    }
+
+    //squash and stretch (is this update or draw ?)
+    if (!on_ground && velocy > 0)
+    {
+        //h += 1;
+    }
+    else
+    {
+        if (h > (24 * scale))
+        {
+            //h -= 1;
+        }
     }
 }
 
