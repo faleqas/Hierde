@@ -172,7 +172,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    object_mng->AddObject(new Abdo(100, 100, 3.5f));
+    //object_mng->AddObject(new Abdo(100, 100, 3.5f));
 
     SDL_Rect rect1 =
     {

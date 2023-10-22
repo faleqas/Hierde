@@ -24,6 +24,8 @@ Object* Object::TestMove(float velocx, float velocy)
         }
         else
         {
+            x -= velocx;
+            y -= velocy;
             return NULL;
         }
     }
@@ -189,6 +191,7 @@ Player::Player(float x, float y, float scale)
     this->y = y;
     this->w = 14 * scale;
     this->h = 24 * scale;
+    this->draw_h = h;
     this->type = OBJECT_PLAYER;
     this->collision_type = COLLISION_SAT;
 }
@@ -293,7 +296,7 @@ void Player::Update()
     }
 
     Object* col = TestMove(0, velocy);
-    if (!col)
+    if (!col && velocy)
     {
         y += velocy;
         on_ground = false;
@@ -307,11 +310,10 @@ void Player::Update()
             if (col)
             {
                 float feet_y = (y + h);
-                if ((feet_y - col->y) > 1)
+                if ((feet_y - col->y) > 0)
                 {
                     y = col->y - h;
                     on_ground = true;
-                    printf("%f vs %f\n", feet_y, col->y);
                 }
             }
         }
@@ -330,17 +332,29 @@ void Player::Update()
     }
 
     //squash and stretch (is this update or draw ?)
-    if (!on_ground && velocy > 0)
-    {
-        //h += 1;
-    }
-    else
-    {
-        if (h > (24 * scale))
-        {
-            //h -= 1;
-        }
-    }
+    //TODO TOMORROW::!:!::: CHANGE ONLY THE DRAWING HEIGHT NOT COLLISION (THIS IS CAUSING ALL THE BUGS)
+    // if (!on_ground && velocy > 0)
+    // {
+    //     if (draw_h < (29 * scale))
+    //     {
+    //         //draw_h += 1;
+    //         //y -= 1;
+    //     }
+    // }
+    // else
+    // {
+    //     if (draw_h > (24 * scale))
+    //     {
+    //         //draw_h -= 2;
+    //         //y += 2;
+    //     }
+    //     else
+    //     {
+    //         draw_h = (24 * scale);
+    //     }
+    // }
+
+    printf("%d\n", on_ground);
 }
 
 void Player::Draw(SDL_Renderer* renderer, Camera* camera)
@@ -388,7 +402,7 @@ void Player::Draw(SDL_Renderer* renderer, Camera* camera)
     anim->flip = flip;
 
     int draw_w = w;
-    int draw_h = h;
+
     int draw_x = x;
     int draw_y = y;
 
