@@ -258,15 +258,17 @@ int main(int argc, char* argv[])
         tic = tick;
     }
 
-    delete asset_mng;
-    object_mng->DeleteObjects();
-    delete object_mng;
+    //// DESTRUCTION CODE NOT NEEDED NOW
+    //// WE MIGHT NEED IT IF THE GAME IS WRAPPED IN A FRONT END OR SOMETHING
+    // delete asset_mng;
+    // object_mng->DeleteObjects();
+    // delete object_mng;
 
-    printf("bye\n");
+    // printf("bye\n");
 
 
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    // SDL_DestroyWindow(window);
+    // SDL_Quit();
     return 0;
 }
 
