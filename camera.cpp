@@ -36,8 +36,5 @@ void Camera::Update()
 
 void Camera::Follow(Object* object)
 {
-    if (object && target != object)
-    {
-        target = object;
-    }
+    target = object;
 }

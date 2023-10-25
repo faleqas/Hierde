@@ -445,12 +445,15 @@ void Player::Draw(SDL_Renderer* renderer, Camera* camera)
         } break;
     };
 
+    int int_draw_x = (int)draw_x;
+    int int_draw_y = (int)draw_y;
+
     if (camera)
     {
-        camera->AdjustPosToCamera((int*)&draw_x, (int*)&draw_y);
+        camera->AdjustPosToCamera(&int_draw_x, &int_draw_y);
     }
 
-    anim->Play(renderer, anim_play_tic, draw_x, draw_y, draw_w, draw_h);
+    anim->Play(renderer, anim_play_tic, int_draw_x, int_draw_y, draw_w, draw_h);
 
     anim_play_tic++;
 }
