@@ -34,7 +34,7 @@ struct Object
     ObjectManager* mng = nullptr;
     int collision_type = COLLISION_AABB;
 
-    const float gravity = 0.05f;
+    const float gravity = 0.1f;
     float velocx = 0;
     float velocy = 0;
 
@@ -72,10 +72,11 @@ struct Player : public Object
     int anim_play_tic = 0;
     bool is_shooting = false;
 
-    int draw_h = h;
+    float draw_h = 0;
+    float draw_w = 0; //drawing dimensions are floats to be more flexible
 
-    const float speed = 1.9f;
-    const float jump_force = 2.0f;
+    const float speed = 3.0f;
+    const float jump_force = 2.0f * 2;
     const float acceleration = 0.2f;
     const float friction = 0.2f;
 

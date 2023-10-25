@@ -192,6 +192,7 @@ Player::Player(float x, float y, float scale)
     this->w = 14 * scale;
     this->h = 24 * scale;
     this->draw_h = h;
+    this->draw_w = w;
     this->type = OBJECT_PLAYER;
     this->collision_type = COLLISION_SAT;
 }
@@ -333,26 +334,32 @@ void Player::Update()
 
     //squash and stretch (is this update or draw ?)
     //TODO TOMORROW::!:!::: CHANGE ONLY THE DRAWING HEIGHT NOT COLLISION (THIS IS CAUSING ALL THE BUGS)
-    // if (!on_ground && velocy > 0)
-    // {
-    //     if (draw_h < (29 * scale))
-    //     {
-    //         //draw_h += 1;
-    //         //y -= 1;
-    //     }
-    // }
-    // else
-    // {
-    //     if (draw_h > (24 * scale))
-    //     {
-    //         //draw_h -= 2;
-    //         //y += 2;
-    //     }
-    //     else
-    //     {
-    //         draw_h = (24 * scale);
-    //     }
-    // }
+    if (!on_ground && velocy > 0)
+    {
+        if (draw_h < (28 * scale))
+        {
+            draw_h += 1;
+        }
+        if (draw_w > (13 * scale))
+        {
+            draw_w -= 1;
+        }
+    }
+    else
+    {
+        if (draw_h > (24 * scale))
+        {
+            draw_h -= 2;
+        }
+        if (draw_w < (14 * scale))
+        {
+            draw_w += 2;
+        }
+        else
+        {
+
+        }
+    }
 
     printf("%d\n", on_ground);
 }
@@ -401,10 +408,14 @@ void Player::Draw(SDL_Renderer* renderer, Camera* camera)
 
     anim->flip = flip;
 
-    int draw_w = w;
+    float draw_x = x;
+    float draw_y = y;
 
-    int draw_x = x;
-    int draw_y = y;
+    float offset_x = (w - draw_w) / 2;
+    float offset_y = (h - draw_h) / 2;
+
+    draw_x += offset_x;
+    draw_y += offset_y;
 
     switch (anim->id)
     {
@@ -436,7 +447,7 @@ void Player::Draw(SDL_Renderer* renderer, Camera* camera)
 
     if (camera)
     {
-        camera->AdjustPosToCamera(&draw_x, &draw_y);
+        camera->AdjustPosToCamera((int*)&draw_x, (int*)&draw_y);
     }
 
     anim->Play(renderer, anim_play_tic, draw_x, draw_y, draw_w, draw_h);
