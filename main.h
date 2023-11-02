@@ -13,7 +13,10 @@ Vector2* AABBToVertices(float x, float y, float w, float h);
 void DrawVertices(SDL_Renderer* renderer, Vector2* vertices, int len);
 
 const int WINDOW_WIDTH = 1280;
-const int WINDOW_HEIGHT = 720;
+const int WINDOW_HEIGHT = 640;
+
+const int TILE_WIDTH = 64;
+const int TILE_HEIGHT = 64;
 
 const float GRAVITY = 0.35f;
 

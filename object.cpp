@@ -339,8 +339,6 @@ void Player::Update()
     }
 
     SquashAndStretch();
-
-    printf("%d\n", on_ground);
 }
 
 void Player::SquashAndStretch()
@@ -493,7 +491,7 @@ void Player::Shoot()
         proj_x -= w / 2;
     }
     
-    int proj_y = y + 3 * scale;
+    int proj_y = y + 4 * scale;
     Projectile* proj = new Projectile(this, proj_x, proj_y, 4, 2,
                                         dir, scale);
     mng->AddObject(proj);

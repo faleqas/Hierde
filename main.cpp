@@ -6,6 +6,7 @@
 #include "object.h"
 #include "vector.h"
 #include "main.h"
+#include "map.h"
 #include <algorithm>
 
 //NEXT: OBJECT HANDLING SYSTEM (CREATION, DELETION) DONE()
@@ -151,22 +152,23 @@ int main(int argc, char* argv[])
     }
 
     ObjectManager* object_mng = new ObjectManager();
-    int player_id = object_mng->AddObject(new Player(200, 0, 3.0f));
+    //int player_id = object_mng->AddObject(new Player(200, 0, 3.0f));
     
-    int tile_x = 0;
-    int tile_y = 0;
-    for (int i = 0; i < 50; i++)
-    {
-        object_mng->AddObject(new Tile(19 * i * 3.0f, 400, 19, 13, 3.0f, 1, 0));
-        tile_x++;
-        if (tile_x >= 5)
-        {
-            tile_x = 0;
-            tile_y++;
-        }
-    }
+    // int tile_x = 0;
+    // int tile_y = 0;
+    // for (int i = 0; i < 50; i++)
+    // {
+    //     object_mng->AddObject(new Tile(19 * i * 3.0f, 400, 19, 13, 3.0f, 1, 0));
+    //     tile_x++;
+    //     if (tile_x >= 5)
+    //     {
+    //         tile_x = 0;
+    //         tile_y++;
+    //     }
+    // }
 
     //object_mng->AddObject(new Abdo(100, 100, 3.5f));
+    LoadMap(object_mng, "C:/Users/admin/source/repos/Temporintial/Debug/level1.map");
 
     SDL_Rect rect1 =
     {
