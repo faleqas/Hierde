@@ -56,16 +56,21 @@ enum
     COL_DIR_RIGHT
 };
 
-struct Player : public Object
+//Collides with other objects
+struct CollidingObject : public Object
+{
+    bool on_ground = false;
+    void Move(float velocity_x, float velocity_y);
+};
+
+struct Player : public CollidingObject
 {
     Player(float x, float y, float scale);
     ~Player();
 
     int dir = 1;
-    int collision_dir = NONE;
     int sprite_indices_index = 0;
 
-    bool on_ground = false;
     int last_shot_elapsed = -1;
     SDL_RendererFlip flip = SDL_FLIP_NONE;
     Animation* anim = nullptr;
@@ -100,25 +105,6 @@ struct Projectile : public Object
 
     void Update() override;
     void Draw(SDL_Renderer* renderer, Camera* camera);
-};
-
-struct Abdo : public Object
-{
-    Abdo(float x, float y, float scale);
-
-    int collision_dir = NONE;
-    int dir = 0;
-    Animation* anim = nullptr;
-    bool on_ground = false;
-
-    float velocx = 0;
-    float velocy = 0;
-
-    const float speed = 1;
-
-    void Update() override;
-    void Draw(SDL_Renderer* renderer, Camera* camera);
-    void OnCollision(Object* collider);
 };
 
 struct Tile : public Object

@@ -145,13 +145,7 @@ int main(int argc, char* argv[])
         }
 
         {
-            Animation* abdo = new Animation();
-            Sprite* frame1 = new Sprite(renderer,
-"C:/Users/admin/source/repos/Temporintial/Temporintial/assets/player/idle.png");
 
-            abdo->AddSprite(frame1);
-            abdo->id = ANIM_ABDO;
-            asset_mng->AddAnimation(abdo);
         }
         
     }

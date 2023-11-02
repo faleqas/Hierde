@@ -198,6 +198,58 @@ Player::Player(float x, float y, float scale)
 }
 
 
+void CollidingObject::Move(float velocity_x, float velocity_y)
+{
+    if (!TestMove(velocx, 0))
+    {
+        x += velocx;
+    }
+    else
+    {
+        Object* col = TestMove(velocx, 0);
+        if (col)
+        {
+            float feet_y = (y + h);
+            if ((feet_y - col->y) > 5)
+            {
+                if (velocx > 0)
+                {
+                    x = col->x - w;
+                }
+                else if (velocx < 0)
+                {
+                    x = col->x + col->w;
+                }
+            }
+        }
+    }
+
+    Object* col = TestMove(0, velocy);
+    if (!col && velocy)
+    {
+        y += velocy;
+        on_ground = false;
+    }
+    else
+    {
+        if (velocy > 0)
+        {
+            on_ground = true;
+            
+            if (col)
+            {
+                float feet_y = (y + h);
+                if ((feet_y - col->y) > 0)
+                {
+                    y = col->y - h;
+                    on_ground = true;
+                }
+            }
+        }
+    }
+}
+
+
 void Player::Update()
 {
     const uint8_t* state = SDL_GetKeyboardState(nullptr);
@@ -272,53 +324,7 @@ void Player::Update()
         }
     }
 
-    if (!TestMove(velocx, 0))
-    {
-        x += velocx;
-    }
-    else
-    {
-        Object* col = TestMove(velocx, 0);
-        if (col)
-        {
-            float feet_y = (y + h);
-            if ((feet_y - col->y) > 5)
-            {
-                if (velocx > 0)
-                {
-                    x = col->x - w;
-                }
-                else if (velocx < 0)
-                {
-                    x = col->x + col->w;
-                }
-            }
-        }
-    }
-
-    Object* col = TestMove(0, velocy);
-    if (!col && velocy)
-    {
-        y += velocy;
-        on_ground = false;
-    }
-    else
-    {
-        if (velocy > 0)
-        {
-            on_ground = true;
-            
-            if (col)
-            {
-                float feet_y = (y + h);
-                if ((feet_y - col->y) > 0)
-                {
-                    y = col->y - h;
-                    on_ground = true;
-                }
-            }
-        }
-    }
+    Move(velocx, velocy);
 
     if (state[SDL_SCANCODE_X])
     {
@@ -575,89 +581,3 @@ void Projectile::Draw(SDL_Renderer* renderer, Camera* camera)
 
     anim->Play(renderer, 0, draw_x, draw_y, w, h);
 }
-
-
-
-
-Abdo::Abdo(float x, float y, float scale)
-{
-    this->x = x;
-    this->y = y;
-    this->w = 12 * scale;
-    this->h = 20 * scale;
-    this->scale = scale;
-    this->born_tic = Gametic();
-    this->type = OBJECT_ABDO;
-}
-
-
-
-void Abdo::Update()
-{
-    if (on_ground)
-    {
-        dir = 1;
-    }
-    velocx = speed * dir;
-
-    if (!mng->IsColliding(this))
-    {
-        velocy += GRAVITY;
-        y += velocy;
-        Object* collider = mng->IsColliding(this);
-        if (collider && !on_ground)
-        {
-            collision_dir = COL_DIR_DOWN;
-            y = collider->y - h;
-            velocy = 0;
-            on_ground = true;
-        }
-        else
-        {
-            on_ground = false;
-        }
-    }
-
-    if (velocy > GRAVITY * 10)
-    {
-        velocy = GRAVITY * 10;
-    }
-
-    x += velocx;
-    Object* collider = mng->IsColliding(this);
-    if (collider)
-    {
-        x -= velocx;
-        velocx = 0;
-    }
-}
-
-void Abdo::OnCollision(Object* collider)
-{
-    if (collider->type == OBJECT_PROJECTILE)
-    {
-        active = false;
-        mng->AddObject(new Abdo(100, -100, scale));
-    }
-}
-
-
-void Abdo::Draw(SDL_Renderer* renderer, Camera* camera)
-{
-    AssetManager* asset_mng = GetAssetMng();
-    Animation* anim = asset_mng->GetAnimation(ANIM_ABDO);
-
-    int draw_x = x;
-    int draw_y = y;
-
-    if (camera)
-    {
-        camera->AdjustPosToCamera(&draw_x, &draw_y);
-    }
-
-    anim->Play(renderer, 0, draw_x, draw_y, w, h);
-}
-
-
-
-
