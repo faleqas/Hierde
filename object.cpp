@@ -338,36 +338,35 @@ void Player::Update()
         last_shot_elapsed++;
     }
 
-    //squash and stretch (is this update or draw ?)
-    //TODO TOMORROW::!:!::: CHANGE ONLY THE DRAWING HEIGHT NOT COLLISION (THIS IS CAUSING ALL THE BUGS)
+    SquashAndStretch();
+
+    printf("%d\n", on_ground);
+}
+
+void Player::SquashAndStretch()
+{
     if (!on_ground && velocy > 0)
     {
-        if (draw_h < (28 * scale))
+        if (draw_h < (h * 1.2f))
         {
             draw_h += 1;
         }
-        if (draw_w > (13 * scale))
+        if (draw_w > (w * 0.95f))
         {
             draw_w -= 1;
         }
     }
     else
     {
-        if (draw_h > (24 * scale))
+        if (draw_h > (h))
         {
             draw_h -= 2;
         }
-        if (draw_w < (14 * scale))
+        if (draw_w < (w))
         {
             draw_w += 2;
         }
-        else
-        {
-
-        }
     }
-
-    printf("%d\n", on_ground);
 }
 
 void Player::Draw(SDL_Renderer* renderer, Camera* camera)

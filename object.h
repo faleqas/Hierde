@@ -86,6 +86,7 @@ struct Player : public CollidingObject
     const float friction = 0.2f;
 
     void Update() override;
+    void SquashAndStretch();
     void Draw(SDL_Renderer* renderer, Camera* camera) override;
     void SetAnim(int anim_id);
     void Shoot();
