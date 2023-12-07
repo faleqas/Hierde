@@ -223,7 +223,7 @@ void CollidingObject::Move(float velocity_x, float velocity_y)
             }
         }
     }
-
+    
     Object* col = TestMove(0, velocy);
     if (!col && velocy)
     {
@@ -256,6 +256,8 @@ void Player::Update()
 
     is_shooting = (last_shot_elapsed < 38) && (last_shot_elapsed > 0);
 
+    printf("%f, %d\n", velocy, on_ground);
+
     if (!on_ground)
     {
         if (!is_shooting)
@@ -269,7 +271,13 @@ void Player::Update()
     }
     else
     {
-        velocy = 0;
+        {
+            velocy = 0;
+        }
+        if (TestMove(0, 2) == NULL)
+        {
+            on_ground = false;
+        }
     }
 
     if (state[SDL_SCANCODE_D])
@@ -324,7 +332,9 @@ void Player::Update()
         }
     }
 
-    Move(velocx, velocy);
+    {
+        Move(velocx, velocy);
+    }
 
     if (state[SDL_SCANCODE_X])
     {
