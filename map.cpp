@@ -51,7 +51,31 @@ int LoadMap(ObjectManager* object_mng, const char* path)
             case 1: //its the player in tiles.txt for the map edtior
             {
                 object_mng->AddObject(new Player(x * TILE_WIDTH, y * TILE_HEIGHT, 3.0f));
-            };
+            } break;
+
+            case 2:
+            {
+                object_mng->AddObject(new Tile(x * TILE_WIDTH, y * TILE_HEIGHT,
+                                               TILE_WIDTH, TILE_HEIGHT,
+                                               1.0f,
+                                               0, 0));
+            } break;
+
+            case 3:
+            {
+                object_mng->AddObject(new Tile(x * TILE_WIDTH, y * TILE_HEIGHT,
+                                               TILE_WIDTH, TILE_HEIGHT,
+                                               1.0f,
+                                               1, 0));
+            } break;
+
+            case 4:
+            {
+                object_mng->AddObject(new Tile(x * TILE_WIDTH, y * TILE_HEIGHT,
+                                               TILE_WIDTH, TILE_HEIGHT,
+                                               1.0f,
+                                               2, 0));
+            } break;
         };
 
         x++;

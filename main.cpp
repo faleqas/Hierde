@@ -168,7 +168,7 @@ int main(int argc, char* argv[])
     // }
 
     //object_mng->AddObject(new Abdo(100, 100, 3.5f));
-    LoadMap(object_mng, "C:/Users/admin/source/repos/Temporintial/Debug/level1.map");
+    LoadMap(object_mng, "C:/Users/admin/source/repos/Temporintial/Debug/FIRST.lvl");
 
     SDL_Rect rect1 =
     {
