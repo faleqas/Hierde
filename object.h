@@ -11,7 +11,8 @@ enum
     OBJECT_PLAYER,
     OBJECT_TILE,
     OBJECT_PROJECTILE,
-    OBJECT_ABDO
+    OBJECT_ABDO,
+    OBJECT_STONER
 };
 
 enum
@@ -61,6 +62,31 @@ struct CollidingObject : public Object
 {
     bool on_ground = false;
     void Move(float velocity_x, float velocity_y);
+};
+
+struct Stoner : public CollidingObject
+{
+    Stoner(float x, float y, float scale);
+    ~Stoner();
+
+    int dir = 1;
+    int sprite_indices_index = 0;
+
+    SDL_RendererFlip flip = SDL_FLIP_NONE;
+    Animation* anim = nullptr;
+    int anim_play_tic = 0;
+
+    float draw_h = 0;
+    float draw_w = 0; //drawing dimensions are floats to be more flexible
+
+    const float speed = 2.0f;
+    const float acceleration = 0.1f;
+    const float friction = 0.2f;
+
+    void Update() override;
+    void Draw(SDL_Renderer* renderer, Camera* camera) override;
+    void SetAnim(int anim_id);
+    void Shoot();
 };
 
 struct Player : public CollidingObject

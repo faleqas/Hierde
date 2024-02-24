@@ -197,6 +197,20 @@ Player::Player(float x, float y, float scale)
     this->collision_type = COLLISION_SAT;
 }
 
+Stoner::Stoner(float x, float y, float scale)
+{
+    born_tic = Gametic();
+    this->scale = scale;
+    this->x = x;
+    this->y = y;
+    this->w = 14 * scale;
+    this->h = 24 * scale;
+    this->draw_h = h;
+    this->draw_w = w;
+    this->type = OBJECT_STONER;
+    this->collision_type = COLLISION_SAT;
+}
+
 
 void CollidingObject::Move(float velocity_x, float velocity_y)
 {
@@ -249,6 +263,44 @@ void CollidingObject::Move(float velocity_x, float velocity_y)
     }
 }
 
+void Stoner::Update()
+{
+    if (!on_ground)
+    {
+        //if (velocy > 0)
+        {
+            velocy += gravity;
+        }
+    }
+    else
+    {
+        {
+            velocy = 0;
+        }
+        if (TestMove(0, 2) == NULL)
+        {
+            on_ground = false;
+        }
+
+        if (TestMove(velocx, 0))
+        {
+            dir *= -1;
+            velocx = 0;
+        }
+
+        velocx += acceleration * dir;
+        if (velocx >= speed)
+        {
+            velocx = speed;
+        }
+        if (velocx <= -speed)
+        {
+            velocx = -speed;
+        }
+    }
+
+    Move(velocx, velocy);
+}
 
 void Player::Update()
 {
@@ -377,6 +429,65 @@ void Player::SquashAndStretch()
     }
 }
 
+void Stoner::Draw(SDL_Renderer* renderer, Camera* camera)
+{
+    if (dir == 1)
+    {
+        flip = SDL_FLIP_NONE;
+    }
+    else
+    {
+        flip = SDL_FLIP_HORIZONTAL;
+    }
+    if (velocx > 0)
+    {
+        SetAnim(ANIM_STONER_RUN);
+        flip = SDL_FLIP_NONE;
+
+        anim->Advance(anim_play_tic,
+        PLAYER_RUN_INDICES, sizeof(PLAYER_RUN_INDICES) / sizeof(int),
+        &sprite_indices_index);
+    }
+    else if (velocx < 0)
+    {
+        SetAnim(ANIM_STONER_RUN);
+        flip = SDL_FLIP_HORIZONTAL;
+
+        anim->Advance(anim_play_tic,
+        PLAYER_RUN_INDICES, sizeof(PLAYER_RUN_INDICES) / sizeof(int),
+        &sprite_indices_index);
+    }
+    else
+    {
+        SetAnim(ANIM_STONER_RUN);
+        anim->Advance(anim_play_tic,
+        PLAYER_IDLE_INDICES, sizeof(PLAYER_IDLE_INDICES) / sizeof(int), &sprite_indices_index);
+    }
+
+    anim->flip = flip;
+
+    float draw_x = x;
+    float draw_y = y;
+
+    float offset_x = (w - draw_w) / 2;
+    float offset_y = (h - draw_h) / 2;
+
+    draw_x += offset_x;
+    draw_y += offset_y; 
+
+    int int_draw_x = (int)draw_x;
+    int int_draw_y = (int)draw_y;
+
+    if (camera)
+    {
+        camera->AdjustPosToCamera(&int_draw_x, &int_draw_y);
+    }
+
+    anim->Play(renderer, anim_play_tic, int_draw_x, int_draw_y, draw_w, draw_h);
+
+    anim_play_tic++;
+}
+
 void Player::Draw(SDL_Renderer* renderer, Camera* camera)
 {
     if (is_shooting)
@@ -472,6 +583,18 @@ void Player::Draw(SDL_Renderer* renderer, Camera* camera)
 }
 
 void Player::SetAnim(int anim_id)
+{
+    if (!anim || (anim->id != anim_id))
+    {
+        AssetManager* asset_mng = GetAssetMng();
+        sprite_indices_index = 0;
+        anim = asset_mng->GetAnimation(anim_id);
+        anim->Restart();
+        anim_play_tic = 0;
+    }
+}
+
+void Stoner::SetAnim(int anim_id)
 {
     if (!anim || (anim->id != anim_id))
     {

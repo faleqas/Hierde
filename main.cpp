@@ -62,6 +62,32 @@ int main(int argc, char* argv[])
         asset_mng->AddAnimation(animation);
 
         {
+            Animation* stoner_run = new Animation();
+
+            const char* frames[] =
+            {
+            "C:/Users/admin/source/repos/Temporintial/Temporintial/assets/stoner/run/1.png",
+            "C:/Users/admin/source/repos/Temporintial/Temporintial/assets/stoner/run/2.png",
+            "C:/Users/admin/source/repos/Temporintial/Temporintial/assets/stoner/run/3.png",
+            "C:/Users/admin/source/repos/Temporintial/Temporintial/assets/stoner/run/4.png",
+            "C:/Users/admin/source/repos/Temporintial/Temporintial/assets/stoner/run/5.png"
+            };
+
+            for (int i = 0; i < sizeof(frames) / sizeof(const char*); i++)
+            {
+                Sprite* sp = new Sprite(renderer, frames[i]);
+                if (sp)
+                {
+                    stoner_run->AddSprite(sp);
+                }
+            }
+
+            stoner_run->id = ANIM_STONER_RUN;
+            stoner_run->speed = 10;
+            asset_mng->AddAnimation(stoner_run);
+        }
+
+        {
             Animation* player_idle = new Animation();
 
             const char* idle_frames[] =
@@ -167,7 +193,7 @@ int main(int argc, char* argv[])
     //     }
     // }
 
-    //object_mng->AddObject(new Abdo(100, 100, 3.5f));
+    object_mng->AddObject(new Stoner(100, 100, 2.8f));
     LoadMap(object_mng, "C:/Users/admin/source/repos/Temporintial/Debug/FIRST.lvl");
 
     SDL_Rect rect1 =
