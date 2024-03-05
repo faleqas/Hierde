@@ -44,7 +44,6 @@ struct Object
     virtual void Update() {};
     virtual void Draw(SDL_Renderer* renderer, Camera* camera) {};
     virtual void OnCollision(Object* collider) {};
-    Object* TestMove(float velocx, float velocy); //true if the move causes a collision
 };
 
 
@@ -63,6 +62,7 @@ struct CollidingObject : public Object
     bool on_ground = false;
     Object* last_collider = NULL;
     void Move(float velocity_x, float velocity_y);
+    Object* TestMove(float velocx, float velocy);
 };
 
 struct Stoner : public CollidingObject //maybe add a delay before switching directions on collision (less buggy and funnier)
@@ -119,7 +119,7 @@ struct Player : public CollidingObject
     void Shoot();
 };
 
-struct Projectile : public Object
+struct Projectile : public CollidingObject
 {
     Projectile(Object* parent, float x, float y, int w, int h, int dir, float scale, float speed = 8);
 

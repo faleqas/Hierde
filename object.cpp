@@ -8,7 +8,7 @@ Object::Object()
     born_tic = Gametic();
 }
 
-Object* Object::TestMove(float velocx, float velocy)
+Object* CollidingObject::TestMove(float velocx, float velocy)
 {
     if (mng)
     {
@@ -18,6 +18,7 @@ Object* Object::TestMove(float velocx, float velocy)
         Object* obj = mng->IsColliding(this);
         if (obj)
         {
+            //last_collider = obj;
             x -= velocx;
             y -= velocy;
             return obj;
@@ -221,9 +222,12 @@ void CollidingObject::Move(float velocity_x, float velocity_y)
     else
     {
         Object* col = TestMove(velocx, 0);
-        if (col && (col != last_collider))
+        if (col)
         {
             last_collider = col;
+        }
+        if (col && (col != last_collider))
+        {
             float feet_y = (y + h);
             if ((feet_y - col->y) > 5)
             {
@@ -247,7 +251,7 @@ void CollidingObject::Move(float velocity_x, float velocity_y)
     }
     else if (col != last_collider && (col))
     {
-        last_collider = col;
+        //last_collider = col;
         if (velocy > 0)
         {
             on_ground = true;
@@ -289,6 +293,7 @@ void Stoner::Update()
 
         if (col != last_collider && (col))
         {
+            last_collider = col;
             dir *= -1;
             printf("switch %p, %p\n", last_collider, TestMove(velocx, 0));
             velocx = 0;
