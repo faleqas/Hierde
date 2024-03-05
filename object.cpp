@@ -280,6 +280,10 @@ void Stoner::LookForPlayer()
 
     if (dist < range)
     {
+        // if (!(state & STONER_SHOOT))
+        // {
+        //     Shoot();
+        // }
         velocx = 0;
         state = STONER_SHOOT;
     }
@@ -330,6 +334,14 @@ void Stoner::Update()
             {
                 velocx = -speed;
             }
+        }
+    }
+
+    if (state & STONER_SHOOT)
+    {
+        if ((Gametic() % 75) == 0)
+        {
+            Shoot();
         }
     }
 
@@ -637,6 +649,30 @@ void Stoner::SetAnim(int anim_id)
         anim->Restart();
         anim_play_tic = 0;
     }
+}
+
+void Stoner::Shoot()
+{
+    int dir = 1;
+    if (flip == SDL_FLIP_HORIZONTAL)
+    {
+        dir = -1;
+    }
+    int proj_x = x;
+
+    if (dir == 1)
+    {
+        proj_x += w;
+    }
+    else
+    {
+        proj_x -= w / 2;
+    }
+    
+    int proj_y = y + 4 * scale;
+    Projectile* proj = new Projectile(this, proj_x, proj_y, 4, 2,
+                                        dir, scale);
+    mng->AddObject(proj);
 }
 
 void Player::Shoot()
