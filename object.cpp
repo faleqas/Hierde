@@ -221,16 +221,17 @@ void CollidingObject::Move(float velocity_x, float velocity_y)
     else
     {
         Object* col = TestMove(velocx, 0);
-        if (col)
+        if (col && (col != last_collider))
         {
+            last_collider = col;
             float feet_y = (y + h);
             if ((feet_y - col->y) > 5)
             {
-                if (velocx > 0)
+                if (velocx > 0 && (col->velocx < 0))
                 {
                     x = col->x - w;
                 }
-                else if (velocx < 0)
+                else if (velocx < 0 && (col->velocx > 0))
                 {
                     x = col->x + col->w;
                 }
@@ -244,8 +245,9 @@ void CollidingObject::Move(float velocity_x, float velocity_y)
         y += velocy;
         on_ground = false;
     }
-    else
+    else if (col != last_collider && (col))
     {
+        last_collider = col;
         if (velocy > 0)
         {
             on_ground = true;
@@ -265,6 +267,7 @@ void CollidingObject::Move(float velocity_x, float velocity_y)
 
 void Stoner::Update()
 {
+    printf("%p\n", last_collider);
     if (!on_ground)
     {
         //if (velocy > 0)
@@ -282,9 +285,12 @@ void Stoner::Update()
             on_ground = false;
         }
 
-        if (TestMove(velocx, 0))
+        Object* col = TestMove(velocx, 0);
+
+        if (col != last_collider && (col))
         {
             dir *= -1;
+            printf("switch %p, %p\n", last_collider, TestMove(velocx, 0));
             velocx = 0;
         }
 
@@ -307,8 +313,6 @@ void Player::Update()
     const uint8_t* state = SDL_GetKeyboardState(nullptr);
 
     is_shooting = (last_shot_elapsed < 38) && (last_shot_elapsed > 0);
-
-    printf("%f, %d\n", velocy, on_ground);
 
     if (!on_ground)
     {
@@ -661,7 +665,6 @@ void Tile::Draw(SDL_Renderer* renderer, Camera* camera)
 Projectile::Projectile(Object* parent, float x, float y, int w, int h, int dir, float scale, float speed)
 {
     born_tic = Gametic();
-    printf("new projectile\n");
     this->parent = parent;
     this->x = x;
     this->y = y;
@@ -683,7 +686,6 @@ void Projectile::Update()
     if (collider)
     {
         active = false;
-        printf("dead\n");
         collider->OnCollision(this);
 
     }
@@ -691,7 +693,6 @@ void Projectile::Update()
     else if ((tic - born_tic) > 2000)
     {
         active = false;
-        printf("dead\n");
     }
 }
 

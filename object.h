@@ -61,10 +61,11 @@ enum
 struct CollidingObject : public Object
 {
     bool on_ground = false;
+    Object* last_collider = NULL;
     void Move(float velocity_x, float velocity_y);
 };
 
-struct Stoner : public CollidingObject
+struct Stoner : public CollidingObject //maybe add a delay before switching directions on collision (less buggy and funnier)
 {
     Stoner(float x, float y, float scale);
     ~Stoner();
