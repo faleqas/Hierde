@@ -56,6 +56,13 @@ enum
     COL_DIR_RIGHT
 };
 
+enum
+{
+    STATE_NONE,
+    STONER_RUN,
+    STONER_SHOOT
+};
+
 //Collides with other objects
 struct CollidingObject : public Object
 {
@@ -72,6 +79,7 @@ struct Stoner : public CollidingObject //maybe add a delay before switching dire
 
     int dir = 1;
     int sprite_indices_index = 0;
+    int state = STONER_RUN;
 
     SDL_RendererFlip flip = SDL_FLIP_NONE;
     Animation* anim = nullptr;
@@ -83,11 +91,13 @@ struct Stoner : public CollidingObject //maybe add a delay before switching dire
     const float speed = 2.0f;
     const float acceleration = 0.1f;
     const float friction = 0.2f;
+    const float range = 300.0f; //in pixels
 
     void Update() override;
     void Draw(SDL_Renderer* renderer, Camera* camera) override;
     void SetAnim(int anim_id);
     void Shoot();
+    void LookForPlayer();
 };
 
 struct Player : public CollidingObject

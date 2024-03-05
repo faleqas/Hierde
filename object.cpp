@@ -269,9 +269,29 @@ void CollidingObject::Move(float velocity_x, float velocity_y)
     }
 }
 
+void Stoner::LookForPlayer()
+{
+    CollidingObject* target = mng->player;
+
+    float dist_x = fabs(target->x - x);
+    float dist_y = fabs(target->y - y);
+
+    float dist = dist_x + dist_y;
+
+    if (dist < range)
+    {
+        velocx = 0;
+        state = STONER_SHOOT;
+    }
+    else
+    {
+        state = STONER_RUN;
+    }
+}
+
 void Stoner::Update()
 {
-    printf("%p\n", last_collider);
+    //printf("%p\n", last_collider);
     if (!on_ground)
     {
         //if (velocy > 0)
@@ -289,27 +309,31 @@ void Stoner::Update()
             on_ground = false;
         }
 
-        Object* col = TestMove(velocx, 0);
+        if (state & STONER_RUN)
+        {
+            Object* col = TestMove(velocx, 0);
 
-        if (col != last_collider && (col))
-        {
-            last_collider = col;
-            dir *= -1;
-            printf("switch %p, %p\n", last_collider, TestMove(velocx, 0));
-            velocx = 0;
-        }
+            if (col != last_collider && (col))
+            {
+                last_collider = col;
+                dir *= -1;
+                printf("switch %p, %p\n", last_collider, TestMove(velocx, 0));
+                velocx = 0;
+            }
 
-        velocx += acceleration * dir;
-        if (velocx >= speed)
-        {
-            velocx = speed;
-        }
-        if (velocx <= -speed)
-        {
-            velocx = -speed;
+            velocx += acceleration * dir;
+            if (velocx >= speed)
+            {
+                velocx = speed;
+            }
+            if (velocx <= -speed)
+            {
+                velocx = -speed;
+            }
         }
     }
 
+    LookForPlayer();
     Move(velocx, velocy);
 }
 
